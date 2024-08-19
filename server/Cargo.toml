@@ -10,6 +10,6 @@ tokio = { workspace = true }
 reqwest = { workspace = true }
 
 axum = {version = "0.7", features = ["macros"]}
-sqlx = {version = "0.7", features = ["mysql", "runtime-tokio"]}
+sqlx = {version = "0.8", features = ["postgres", "runtime-tokio"]}
 dotenvy = "0.15"
-tower = {version = "0.4", features = ["util"]}
+tower = {version = "0.5", features = ["util"]}
