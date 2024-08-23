@@ -11,7 +11,7 @@ async fn main() {
     println!("token {:?}", token);
     let client = reqwest::Client::new();
     let res = client
-        .get("https://us.api.blizzard.com/hearthstone/cards/52119-arch-villain-rafaam?locale=zh_CN")
+        .get("https://us.api.blizzard.com/hearthstone/cards/?class=deathknight&set=standard&sort=manaCost:asc,name:asc,classes:asc,groupByClass:asc,groupByClass:asc&locale=zh_CN")
         .headers(get_author_header(&token))
         .send()
         .await
