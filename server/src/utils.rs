@@ -7,7 +7,16 @@ pub fn get_env_var(key: &str) -> String {
     "".to_string()
 }
 
-pub async fn get_token() -> String {
+pub async fn get_token(state: crate::AppState) -> String {
+    let token = state.token.lock().await;
+    token.clone()
+}
+pub async fn set_token(state: crate::AppState) {
+    let new_token = new_token().await;
+    let mut token = state.token.lock().await;
+    *token = new_token;
+}
+pub async fn new_token() -> String {
     let client_id = get_env_var("client_id");
     let client_secret = get_env_var("client_secret");
 
