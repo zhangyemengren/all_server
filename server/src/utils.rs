@@ -10,11 +10,11 @@ pub fn get_env_var(key: &str) -> String {
     "".to_string()
 }
 
-pub async fn get_token(state: crate::AppState) -> String {
+pub async fn get_token(state: crate::app::AppState) -> String {
     let token = state.token.lock().await;
     token.clone()
 }
-pub async fn set_token(state: crate::AppState) -> String {
+pub async fn set_token(state: crate::app::AppState) -> String {
     let new_token = new_token().await;
     let mut token = state.token.lock().await;
     *token = new_token.clone();
@@ -32,10 +32,18 @@ pub async fn new_token() -> String {
         .basic_auth(client_id, Some(client_secret))
         .form(&params)
         .send()
-        .await
-        .unwrap();
-    let data = res.json::<serde_json::Value>().await.unwrap();
-    data["access_token"].as_str().unwrap().to_string()
+        .await;
+    let Ok(res) = res else {
+        println!("fetch token error");
+        return "".to_string();
+    };
+    let Ok(data) = res.json::<serde_json::Value>().await else {
+        println!("json parse error");
+        return "".to_string();
+    };
+    data["access_token"]
+        .as_str()
+        .map_or("".to_string(), |s| s.to_string())
 }
 
 pub fn get_author_header(token: &str) -> axum::http::HeaderMap {
@@ -75,4 +83,8 @@ pub async fn request_blizzard_api(
         }
         any_code => Err(any_code),
     }
+}
+
+pub fn default_locale() -> String {
+    "zh_CN".to_string()
 }

@@ -1,4 +1,7 @@
-use crate::{get_cards, get_meta_sets, get_token, root, set_token};
+use crate::{
+    routers::{card::get_cards, meta::get_meta, root::root},
+    utils::{get_token, set_token},
+};
 use axum::{
     body::{to_bytes, Body},
     extract::{Request, State},
@@ -51,7 +54,8 @@ pub async fn new_app() -> Router {
     Router::new()
         .route("/", get(root))
         .route("/cards", get(get_cards))
-        .route("/meta/sets", get(get_meta_sets))
+        .route("/meta", get(get_meta))
+        .route("/meta/:type", get(get_meta))
         .route_layer(middleware::from_fn_with_state(state.clone(), refresh_token))
         .with_state(state)
 }
