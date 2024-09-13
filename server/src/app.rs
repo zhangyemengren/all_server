@@ -1,4 +1,4 @@
-use crate::{get_cards, get_token, root, set_token};
+use crate::{get_cards, get_meta_sets, get_token, root, set_token};
 use axum::{
     body::{to_bytes, Body},
     extract::{Request, State},
@@ -13,12 +13,14 @@ use tokio::sync::Mutex;
 #[derive(Clone)]
 pub struct AppState {
     pub(crate) token: Arc<Mutex<String>>,
+    pub(crate) client: reqwest::Client,
 }
 
 impl AppState {
     fn new() -> Self {
         AppState {
             token: Arc::new(Mutex::new("".to_string())),
+            client: reqwest::Client::new(),
         }
     }
 }
@@ -32,10 +34,7 @@ async fn refresh_token(State(state): State<AppState>, request: Request, next: Ne
     // 执行handler
     let mut request = Request::from_parts(parts, Body::from(body_bytes));
     request.extensions_mut().insert(token);
-    let response = next
-        .clone()
-        .run(request)
-        .await;
+    let response = next.clone().run(request).await;
     // 4xx 刷新token 重发一次请求
     if response.status().is_client_error() {
         println!("refresh_token");
@@ -52,6 +51,7 @@ pub async fn new_app() -> Router {
     Router::new()
         .route("/", get(root))
         .route("/cards", get(get_cards))
+        .route("/meta/sets", get(get_meta_sets))
         .route_layer(middleware::from_fn_with_state(state.clone(), refresh_token))
         .with_state(state)
 }
