@@ -68,7 +68,7 @@ pub async fn request_blizzard_api(
         StatusCode::UNAUTHORIZED => Err(StatusCode::UNAUTHORIZED),
         StatusCode::OK => {
             if let Ok(json) = res.json::<Value>().await {
-                Ok(Json(Response::ok(json)))
+                Response::ok(json).into_axum_response()
             } else {
                 Err(StatusCode::INTERNAL_SERVER_ERROR)
             }
