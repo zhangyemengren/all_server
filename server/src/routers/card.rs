@@ -55,7 +55,7 @@ pub async fn get_cards(
         page_size,
         page,
         s_type,
-        mana_cost
+        mana_cost,
     } = params;
     let url = format!(
         "https://us.api.blizzard.com/hearthstone/cards/?\
