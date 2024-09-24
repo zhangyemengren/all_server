@@ -34,6 +34,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Run tests
         env:
-          client_id: ${{ vars.CLIENT_ID }}
+          client_id: ${{ secrets.CLIENT_ID }}
           client_secret: ${{ secrets.CLIENT_SECRET }}
         run: cargo test --workspace --all-features --all-targets
