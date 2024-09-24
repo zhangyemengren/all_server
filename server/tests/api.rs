@@ -10,6 +10,6 @@ async fn meta() {
     let body = to_bytes(res.into_body(), usize::MAX).await.unwrap();
     let body: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(body["status"], 200);
-    let card_back_categories = &body["data"]["card_back_categories"].as_array().unwrap();
+    let card_back_categories = &body["data"]["cardBackCategories"].as_array().unwrap();
     assert!(!card_back_categories.is_empty());
 }
