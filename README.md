@@ -14,3 +14,6 @@ curl -u {client_id}:{client_secret} -d grant_type=client_credentials https://oau
 
 ### api with token
 curl -H "Authorization: Bearer {}" "https://us.api.blizzard.com/hearthstone/cards/52119-arch-villain-rafaam?locale=zh_CN"
+
+## docker运行时指定配置文件
+docker run --env-file ./path/to/.env -d --name <container_name> <image_name>
