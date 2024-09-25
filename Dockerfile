@@ -1,4 +1,4 @@
-FROM rust:latest as builder
+FROM rust:bookworm as builder
 WORKDIR /usr/src/app
 COPY . .
 RUN cargo build --release --package server --bin server
