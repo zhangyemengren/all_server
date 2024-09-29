@@ -17,4 +17,12 @@ curl -H "Authorization: Bearer {}" "https://us.api.blizzard.com/hearthstone/card
 
 ## docker运行时指定配置文件
 sudo docker build -t hs_server .
-sudo docker run --env-file .env -p 8000:8000 hs_server
+sudo docker compose up
+
+## ENV KEY
+client_id=
+client_secret=
+DATABASE_URL=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
