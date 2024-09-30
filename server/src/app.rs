@@ -2,6 +2,7 @@ use crate::{
     routers::{card::get_cards, meta::get_meta, root::root},
     utils::{get_token, set_token},
 };
+use axum::http::StatusCode;
 use axum::{
     body::{to_bytes, Body},
     extract::{Request, State},
@@ -38,8 +39,8 @@ async fn refresh_token(State(state): State<AppState>, request: Request, next: Ne
     let mut request = Request::from_parts(parts, Body::from(body_bytes));
     request.extensions_mut().insert(token);
     let response = next.clone().run(request).await;
-    // 4xx 刷新token 重发一次请求
-    if response.status().is_client_error() {
+    // 401 刷新token 重发一次请求
+    if response.status() == StatusCode::UNAUTHORIZED {
         println!("refresh_token");
         // 封装了 单独使用需要注意Mutex释放
         let token = set_token(state).await;
