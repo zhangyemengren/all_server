@@ -10,9 +10,11 @@
 ### b端
 上传数据
 
-## docker运行时指定配置文件
-sudo docker build -t hs_server .
-sudo docker compose up
+## docker
+### 重新构建
+sudo docker compose build
+### 重启
+sudo docker compose up -d
 
 ## ENV KEY
 client_id=
