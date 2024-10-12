@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use axum::Json;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Debug, Clone, Serialize)]
@@ -28,4 +28,15 @@ impl Response {
     pub fn into_axum_response(self) -> Result<Json<Response>, StatusCode> {
         Ok(Json(self))
     }
+}
+/// BlizzardLocaleQuery查询参数
+#[derive(Deserialize)]
+pub struct BlizzardLocaleQuery {
+    /// 语言
+    #[serde(default = "default_locale")]
+    pub locale: String,
+}
+
+pub fn default_locale() -> String {
+    "zh_CN".to_string()
 }

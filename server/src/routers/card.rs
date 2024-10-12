@@ -1,8 +1,9 @@
 use crate::{
     app::AppState,
-    data::Response,
-    utils::{default_locale, request_blizzard_api},
+    data::{BlizzardLocaleQuery, Response},
+    utils::request_blizzard_api,
 };
+use axum::extract::Path;
 use axum::{
     extract::{Query, State},
     Extension, Json,
@@ -25,13 +26,12 @@ fn default_type() -> String {
     "minion".to_string()
 }
 
-/// 查询参数
+/// CardsQuery查询参数
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PageQuery {
-    /// 语言
-    #[serde(default = "default_locale")]
-    pub locale: String,
+pub struct CardsQuery {
+    #[serde(flatten)]
+    pub b_wrapper: BlizzardLocaleQuery,
     /// 卡牌集 标准 威兹班的工坊等
     #[serde(default = "default_set")]
     pub set: String,
@@ -62,11 +62,11 @@ pub struct PageQuery {
 pub async fn get_cards(
     State(state): State<AppState>,
     Extension(token): Extension<String>,
-    Query(params): Query<PageQuery>,
+    Query(params): Query<CardsQuery>,
 ) -> Result<Json<Response>, axum::http::StatusCode> {
     let client = state.client;
-    let PageQuery {
-        locale,
+    let CardsQuery {
+        b_wrapper: BlizzardLocaleQuery { locale },
         class,
         set,
         page_size,
@@ -87,6 +87,20 @@ pub async fn get_cards(
         sort=manaCost:asc,name:asc,classes:asc,groupByClass:asc,groupByClass:asc&\
         locale={locale}",
     );
-    println!("url: {}", url);
+    request_blizzard_api(&client, &url, &token).await
+}
+/// 获取卡牌详情
+/// # 例子
+/// ```http
+/// GET /cards/80818?locale=zh_CN
+/// ```
+pub async fn get_card_detail(
+    State(state): State<AppState>,
+    Extension(token): Extension<String>,
+    Query(BlizzardLocaleQuery { locale }): Query<BlizzardLocaleQuery>,
+    Path(id): Path<String>,
+) -> Result<Json<Response>, axum::http::StatusCode> {
+    let client = state.client;
+    let url = format!("https://us.api.blizzard.com/hearthstone/cards/{id}?locale={locale}");
     request_blizzard_api(&client, &url, &token).await
 }

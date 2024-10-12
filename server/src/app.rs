@@ -1,5 +1,9 @@
 use crate::{
-    routers::{card::get_cards, meta::get_meta, root::root},
+    routers::{
+        card::{get_card_detail, get_cards},
+        meta::get_meta,
+        root::root,
+    },
     utils::{get_token, set_token},
 };
 use axum::http::StatusCode;
@@ -55,6 +59,7 @@ pub async fn new_app() -> Router {
     Router::new()
         .route("/", get(root))
         .route("/cards", get(get_cards))
+        .route("/cards/:id", get(get_card_detail))
         .route("/meta", get(get_meta))
         .route("/meta/:type", get(get_meta))
         .route_layer(middleware::from_fn_with_state(state.clone(), refresh_token))

@@ -84,7 +84,3 @@ pub async fn request_blizzard_api(
         any_code => Err(any_code),
     }
 }
-
-pub fn default_locale() -> String {
-    "zh_CN".to_string()
-}
