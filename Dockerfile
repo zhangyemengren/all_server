@@ -1,6 +1,16 @@
 FROM rust:bookworm as builder
 WORKDIR /usr/src/app
 COPY . .
+
+RUN cargo install trunk
+# 进入 web 文件夹并打包前端资源
+WORKDIR /usr/src/app/web
+RUN trunk build --release
+# 移动打包后的资源到 dist 目录
+RUN mkdir -p /usr/src/app/dist && \
+    mv dist/* /usr/src/app/dist/ \
+# 回到根目录并继续构建 server
+WORKDIR /usr/src/app
 RUN cargo build --release --package server --bin server
 
 FROM debian:bookworm-slim

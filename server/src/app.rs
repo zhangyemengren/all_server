@@ -6,7 +6,6 @@ use crate::{
     },
     utils::{get_token, set_token},
 };
-use axum::http::StatusCode;
 use axum::{
     body::{to_bytes, Body},
     extract::{Request, State},
@@ -14,6 +13,10 @@ use axum::{
     response::Response,
     routing::get,
     Router,
+    http::StatusCode
+};
+use tower_http::{
+    services::{ServeDir, ServeFile},
 };
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -64,4 +67,5 @@ pub async fn new_app() -> Router {
         .route("/meta/:type", get(get_meta))
         .route_layer(middleware::from_fn_with_state(state.clone(), refresh_token))
         .with_state(state)
+        .nest_service("/dist", ServeDir::new("dist"))
 }
