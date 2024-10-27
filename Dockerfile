@@ -1,7 +1,7 @@
 FROM rust:bookworm as builder
 WORKDIR /usr/src/app
 COPY . .
-
+RUN apt-get update && apt-get install -y git
 RUN cargo install trunk
 # 进入 web 文件夹并打包前端资源
 WORKDIR /usr/src/app/web
