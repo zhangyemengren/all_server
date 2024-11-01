@@ -9,17 +9,15 @@ use crate::{
 use axum::{
     body::{to_bytes, Body},
     extract::{Request, State},
+    http::StatusCode,
     middleware::{self, Next},
     response::Response,
     routing::get,
     Router,
-    http::StatusCode
-};
-use tower_http::{
-    services::{ServeDir, ServeFile},
 };
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use tower_http::services::{ServeDir};
 
 #[derive(Clone)]
 pub struct AppState {
