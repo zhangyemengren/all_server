@@ -1,4 +1,4 @@
-use server::app::new_app;
+use hs_server::app::new_app;
 
 #[tokio::main]
 async fn main() {

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [ "server" , "web" ]
+members = [ "hs_server" , "web" ]
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

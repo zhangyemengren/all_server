@@ -4,8 +4,8 @@ use axum::{
     http::{Method, Request},
     response::Response,
 };
-use server::app::new_app;
-use server::utils::{get_author_header, new_token};
+use hs_server::app::new_app;
+use hs_server::utils::{get_author_header, new_token};
 use tower::ServiceExt;
 
 pub async fn do_request(uri: &str, body: Option<Body>) -> Response {

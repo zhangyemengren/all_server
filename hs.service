@@ -1,17 +1,17 @@
 [Unit]
-Description=HS Service
+Description=Service
 After=network.target postgresql.service
 Wants=postgresql.service
 
 [Service]
 Type=simple
 User=lighthouse
-WorkingDirectory=/home/lighthouse/project/heartstone_api
+WorkingDirectory=/home/lighthouse/project/all_server
 # 从.env文件加载环境变量
-EnvironmentFile=/home/lighthouse/project/heartstone_api/.env
+EnvironmentFile=/home/lighthouse/project/all_server/.env
 
 # 二进制
-ExecStart=/home/lighthouse/project/heartstone_api/target/release/server
+ExecStart=/home/lighthouse/project/all_server/target/release/hs_server
 
 Restart=always
 RestartSec=5
