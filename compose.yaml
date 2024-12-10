@@ -10,7 +10,7 @@ services:
   homepage:
     image: "ghcr.io/gethomepage/homepage:latest"
     ports:
-      - "7000:7000"
+      - "3000:3000"
     volumes:
       - "homepage_data:/app/config"
 volumes:
