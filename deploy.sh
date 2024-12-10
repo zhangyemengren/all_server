@@ -1,8 +1,9 @@
 #!/bin/bash
+git pull
 # 停止现有的 docker compose 服务
 sudo docker compose down
 
-# 只启动数据库服务
+# 启动docker服务
 sudo docker compose up -d
 
 # 编译项目

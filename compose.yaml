@@ -7,5 +7,12 @@ services:
       - "5432:5432"
     volumes:
       - "db_data:/var/lib/postgresql/data"
+  homepage:
+    image: "ghcr.io/gethomepage/homepage:latest"
+    ports:
+      - "7000:7000"
+    volumes:
+      - "homepage_data:/app/config"
 volumes:
   db_data:
+  homepage_data:
