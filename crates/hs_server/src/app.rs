@@ -17,7 +17,6 @@ use axum::{
 };
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use tower_http::services::ServeDir;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -65,5 +64,4 @@ pub async fn new_app() -> Router {
         .route("/meta/:type", get(get_meta))
         .route_layer(middleware::from_fn_with_state(state.clone(), refresh_token))
         .with_state(state)
-        .nest_service("/dist", ServeDir::new("dist"))
 }
