@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use thaw::{Button, ConfigProvider};
 
 #[component]
 pub fn SimpleCounter(initial_value: i32) -> impl IntoView {
@@ -14,14 +15,18 @@ pub fn SimpleCounter(initial_value: i32) -> impl IntoView {
     view! {
 
         <div>
-            <button on:click=clear>"Clear"</button>
-            <button on:click=decrement>"-1"</button>
+            <Button on:click=clear>"Clear"</Button>
+            <Button on:click=decrement>"-1"</Button>
             <span>"Value: " {move || value.get().to_string()} "!"</span>
-            <button on:click=increment>"+1"</button>
+            <Button on:click=increment>"+1"</Button>
         </div>
     }
 }
 
 pub fn main() {
-    mount_to_body(|| view! { <SimpleCounter initial_value=3 /> })
+    mount_to_body(|| view! {
+        <ConfigProvider>
+            <SimpleCounter initial_value=3 />
+        </ConfigProvider>
+    })
 }
