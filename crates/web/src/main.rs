@@ -24,9 +24,11 @@ pub fn SimpleCounter(initial_value: i32) -> impl IntoView {
 }
 
 pub fn main() {
-    mount_to_body(|| view! {
-        <ConfigProvider>
-            <SimpleCounter initial_value=3 />
-        </ConfigProvider>
+    mount_to_body(|| {
+        view! {
+            <ConfigProvider>
+                <SimpleCounter initial_value=3 />
+            </ConfigProvider>
+        }
     })
 }

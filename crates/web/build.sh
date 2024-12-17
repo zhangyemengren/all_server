@@ -5,6 +5,9 @@ set -eux
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 source $HOME/.cargo/env
 
+# 添加wasm32-unknown-unknown目标
+rustup target add wasm32-unknown-unknown
+
 # 安装 trunk
 cargo install trunk
 
