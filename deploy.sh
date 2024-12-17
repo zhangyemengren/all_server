@@ -7,7 +7,7 @@ sudo docker compose down
 sudo docker compose up -d
 
 # 编译项目
-cargo build --release --package hs_server --bin server
+cargo build --release --package hs_server
 
 # 复制 systemd 服务文件
 sudo cp hs.service /etc/systemd/system/
