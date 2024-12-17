@@ -1,7 +1,4 @@
 {
     "buildCommand": "bash build.sh",
-    "outputDirectory": "dist",
-    "routes": [
-        { "src": "/(.*)", "dest": "/index.html" }
-    ]
+    "outputDirectory": "dist"
 }
