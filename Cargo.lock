@@ -1722,6 +1722,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "recipes_server"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "dotenvy",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "tower-http",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
