@@ -1,16 +1,19 @@
+use anyhow::{anyhow, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
-use anyhow::{anyhow, Result};
 
 pub struct Crypto;
 
 impl Crypto {
-    pub fn hash_password(password: &[u8]) -> Result<String>{
+    pub fn hash_password(password: &[u8]) -> Result<String> {
         let salt = SaltString::generate(&mut OsRng);
         let argon = Argon2::default();
-        let password_hash = argon.hash_password(password, &salt).map_err(|e| anyhow::anyhow!(e))?.to_string();
+        let password_hash = argon
+            .hash_password(password, &salt)
+            .map_err(|e| anyhow::anyhow!(e))?
+            .to_string();
         Ok(password_hash)
     }
     pub fn verify_password(password: &[u8], password_hash: &str) -> Result<bool> {
@@ -87,4 +90,3 @@ mod tests {
         Ok(())
     }
 }
-
