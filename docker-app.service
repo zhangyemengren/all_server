@@ -1,0 +1,15 @@
+[Unit]
+Description=Docker Compose Application
+After=network.target docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/lighthouse/project/all_server
+ExecStart=/usr/local/bin/docker-compose up -d
+ExecStop=/usr/local/bin/docker-compose down
+Restart=always
+User=lighthouse
+
+
+[Install]
+WantedBy=multi-user.target

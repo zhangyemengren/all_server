@@ -1902,6 +1902,7 @@ dependencies = [
  "argon2",
  "axum",
  "dotenvy",
+ "http",
  "jiff",
  "jsonwebtoken",
  "password-hash",
