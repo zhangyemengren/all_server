@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use anyhow::{anyhow, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
@@ -6,6 +5,7 @@ use argon2::{
 };
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{de::DeserializeOwned, Serialize};
+use std::fmt::Debug;
 
 pub struct Crypto;
 

@@ -58,6 +58,5 @@ pub fn new_app() -> Router {
     let nest_routers: Router<()> = Router::new()
         .nest("/cs", cs_routers)
         .nest("/bs", bs_routers);
-    let all = Router::new().merge(pub_router).merge(nest_routers);
-    all
+    Router::new().merge(pub_router).merge(nest_routers)
 }
