@@ -1,12 +1,16 @@
+use std::fmt::Debug;
 use anyhow::{anyhow, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use serde::{de::DeserializeOwned, Serialize};
 
 pub struct Crypto;
 
 impl Crypto {
+    const SECRET: &'static [u8] = b"secret";
     pub fn hash_password(password: &[u8]) -> Result<String> {
         let salt = SaltString::generate(&mut OsRng);
         let argon = Argon2::default();
@@ -21,11 +25,33 @@ impl Crypto {
         let parsed_hash = PasswordHash::new(password_hash).map_err(|e| anyhow!(e))?;
         Ok(argon.verify_password(password, &parsed_hash).is_ok())
     }
+    pub fn encode_token<T>(claims: T) -> Result<String>
+    where
+        T: Debug + Serialize,
+    {
+        let header = Header::default();
+        let key = Self::SECRET;
+        let token = encode(&header, &claims, &EncodingKey::from_secret(key))?;
+        Ok(token)
+    }
+    pub fn decode_token<T>(token: &str) -> Result<T>
+    where
+        T: Debug + DeserializeOwned,
+    {
+        let key = Self::SECRET;
+        let token_data = decode::<T>(
+            token,
+            &DecodingKey::from_secret(key),
+            &Validation::default(),
+        )?;
+        Ok(token_data.claims)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde::Deserialize;
 
     #[test]
     fn test_hash_password_success() -> Result<()> {
@@ -86,6 +112,58 @@ mod tests {
         // 验证都应该通过
         assert!(is_valid1);
         assert!(is_valid2);
+
+        Ok(())
+    }
+    #[test]
+    fn test_token_success() -> Result<()> {
+        use jiff::Timestamp;
+        use std::time::Duration;
+
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Claims {
+            sub: String,
+            exp: usize,
+        }
+
+        let exp = Timestamp::now() + Duration::from_secs(60);
+        let claims = Claims {
+            sub: "user_id".to_string(),
+            exp: exp.as_second() as usize,
+        };
+
+        let token = Crypto::encode_token(&claims)?;
+        println!("token: {}", token);
+        assert!(!token.is_empty(), "生成的 token 不应该为空");
+
+        let decoded_claims: Claims = Crypto::decode_token(&token)?;
+        assert_eq!(claims.sub, decoded_claims.sub);
+        print!("decoded_claims: {:?}", decoded_claims);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_token_expired() -> Result<()> {
+        use jiff::Timestamp;
+        use std::time::Duration;
+
+        #[derive(Debug, Serialize, Deserialize)]
+        struct Claims {
+            sub: String,
+            exp: u64,
+        }
+
+        // jwt库默认leeway偏差为60秒 实际需要超时60秒以上才过期
+        let exp = Timestamp::now() - Duration::from_secs(61);
+        let claims = Claims {
+            sub: "user_id".to_string(),
+            exp: exp.as_second() as u64,
+        };
+
+        let token = Crypto::encode_token(&claims)?;
+        let result = Crypto::decode_token::<Claims>(&token);
+        assert!(result.is_err(), "过期的 token 应该解码失败");
 
         Ok(())
     }
