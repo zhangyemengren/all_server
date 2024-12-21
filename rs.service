@@ -1,5 +1,7 @@
 [Unit]
-Description=HS Service
+Description=Recipes Service
+After=network.target postgresql.service
+Wants=postgresql.service
 
 [Service]
 Type=simple
@@ -9,7 +11,7 @@ WorkingDirectory=/home/lighthouse/project/all_server
 EnvironmentFile=/home/lighthouse/project/all_server/.env
 
 # 二进制
-ExecStart=/home/lighthouse/project/all_server/target/release/hs_server
+ExecStart=/home/lighthouse/project/all_server/target/release/recipes_server
 
 Restart=always
 RestartSec=5

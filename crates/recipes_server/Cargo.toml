@@ -11,4 +11,10 @@ reqwest = { workspace = true }
 dotenvy = {workspace = true}
 axum ={workspace = true, features = ["macros", "query"]}
 tower = {workspace = true, features = ["util"]}
-tower-http = {workspace = true, features = ["fs"]}
+tower-http = {workspace = true, features = ["fs", "add-extension"]}
+argon2 = {workspace = true, features = ["password-hash"]}
+password-hash = {workspace = true, features = ["getrandom"]}
+anyhow = {workspace = true}
+jsonwebtoken = {workspace = true}
+jiff = {workspace = true}
+http = {workspace = true}
