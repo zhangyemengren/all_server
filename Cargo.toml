@@ -8,7 +8,7 @@ serde_json = "1"
 anyhow = "1"
 tokio = { version = "1", features = ["full"] }
 reqwest = { version = "0.12", features = ["json"] }
-axum = {version = "0.8.0-rc.1", features = ["macros", "query"]}
+axum = {version = "0.8.0", features = ["macros", "query"]}
 sqlx = {version = "0.8", features = ["postgres", "runtime-tokio"]}
 dotenvy = "0.15"
 tower = {version = "0.5", features = ["util"]}
