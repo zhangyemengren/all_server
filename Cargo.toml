@@ -18,3 +18,4 @@ password-hash = {version = "0.5", features = ["getrandom"]}
 jsonwebtoken = "9"
 jiff = {version = "0.1"}
 http = {version = "1"}
+regex = "1"
