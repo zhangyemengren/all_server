@@ -5,22 +5,30 @@ struct A {
     #[validate(email)]
     m: String, // 注意是 String 类型
 }
+#[derive(Validate)]
+#[validate]
+struct B {
+    #[validate(email)]
+    _m: String, // 注意是 String 类型
+}
 
 #[test]
-fn test() {
-    let a_ok = A { m: "not_empty".to_string() };
+fn test_filed() {
+    let a_ok = A {
+        m: "not_empty".to_string(),
+    };
     let a_err = A { m: "".to_string() };
 
-    // 正常情况
-    match a_ok.validate() {
-        Ok(_) => println!("a_ok passed validation"),
-        Err(e) => println!("a_ok failed validation: {}", e),
-    }
+    assert_eq!(a_ok.validate().is_ok(), true);
+    assert_eq!(a_err.validate().is_err(), true);
+}
+#[test]
+fn test_struct() {
+    let b_ok = B {
+        _m: "not_empty".to_string(),
+    };
+    let b_empty = B { _m: "".to_string() };
 
-    // 空值情况
-    match a_err.validate() {
-        Ok(_) => println!("a_err passed validation"),
-        Err(e) => println!("a_err failed validation: {}", e),
-    }
-    assert!(true)
+    assert_eq!(b_ok.validate(|_| Ok(())).is_ok(), true);
+    assert_eq!(b_empty.validate(|_| Ok(())).is_ok(), true);
 }
