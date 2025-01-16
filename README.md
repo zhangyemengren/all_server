@@ -1,4 +1,4 @@
 ## 文档
 ```
-cargo doc --no-deps --ope
+cargo doc --no-deps --open
 ```
