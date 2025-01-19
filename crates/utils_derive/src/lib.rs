@@ -2,13 +2,11 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Fields};
 
-
 #[proc_macro_derive(Validate, attributes(validate))]
 pub fn derive_validate(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let struct_ident = &ast.ident;
     let has_struct_validate = has_struct_level_validate(&ast.attrs);
-    
 
     let expanded = if has_struct_validate {
         // 仅生成可传入Fn的校验方法，忽略字段校验
@@ -43,6 +41,20 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
                                         let email_regex = regex::Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
                                         if !email_regex.is_match(&self.#field_ident) {
                                             errors.push(format!("`{}` is not a valid email address", stringify!(#field_ident)));
+                                        }
+                                    },
+                                    "password" => quote! {
+                                        let password_regex = regex::Regex::new(r"^[A-Za-z\d@$!%*?&]{8,}$").unwrap();
+                                        // 检查是否包含小写字母
+                                        let has_lowercase = self.#field_ident.chars().any(|c| c.is_ascii_lowercase());
+                                        // 检查是否包含大写字母
+                                        let has_uppercase = self.#field_ident.chars().any(|c| c.is_ascii_uppercase());
+                                        // 检查是否包含数字
+                                        let has_digit = self.#field_ident.chars().any(|c| c.is_ascii_digit());
+                                        // 检查是否包含特殊字符
+                                        let has_special = self.#field_ident.chars().any(|c| "@$!%*?&".contains(c));
+                                        if !password_regex.is_match(&self.#field_ident) || !has_lowercase || !has_uppercase || !has_digit || !has_special {
+                                            errors.push(format!("`{}` is not a valid password", stringify!(#field_ident)));
                                         }
                                     },
                                     _ => quote! {
@@ -89,8 +101,10 @@ fn get_validate_type_from_attr(attr: &Attribute) -> Option<String> {
     let mut result = None;
     let parse_result = attr.parse_nested_meta(|meta| {
         // 若 meta 为 email，则记录下来
-        if meta.path.is_ident("email") {
-            result = Some("email".to_string());
+        match meta.path.get_ident() {
+            Some(ident) if ident == "email" => result = Some("email".to_string()),
+            Some(ident) if ident == "password" => result = Some("password".to_string()),
+            _ => (),
         }
         // 其他情况可继续扩展
         Ok(())
