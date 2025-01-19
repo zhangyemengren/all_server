@@ -15,7 +15,7 @@ struct B {
 #[test]
 fn test_filed() {
     let a_ok = A {
-        m: "not_empty".to_string(),
+        m: "123@qq.com".to_string(),
     };
     let a_err = A { m: "".to_string() };
 
@@ -25,7 +25,7 @@ fn test_filed() {
 #[test]
 fn test_struct() {
     let b_ok = B {
-        _m: "not_empty".to_string(),
+        _m: "123@qq.com".to_string(),
     };
     let b_empty = B { _m: "".to_string() };
 

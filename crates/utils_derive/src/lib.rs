@@ -2,11 +2,13 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Fields};
 
+
 #[proc_macro_derive(Validate, attributes(validate))]
 pub fn derive_validate(input: TokenStream) -> TokenStream {
     let ast = parse_macro_input!(input as DeriveInput);
     let struct_ident = &ast.ident;
     let has_struct_validate = has_struct_level_validate(&ast.attrs);
+    
 
     let expanded = if has_struct_validate {
         // 仅生成可传入Fn的校验方法，忽略字段校验
@@ -22,7 +24,7 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
         }
     } else {
         // 原有字段校验逻辑
-        // 准备一个容器，用于存储要生成的“检查逻辑”
+        // 准备一个容器，用于存储要生成的"检查逻辑"
         let mut field_checks = proc_macro2::TokenStream::new();
 
         if let Data::Struct(data_struct) = &ast.data {
@@ -38,8 +40,9 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
                                 // 根据 validator_type 生成不同的校验逻辑
                                 let check_code = match validator_type.as_str() {
                                     "email" => quote! {
-                                        if self.#field_ident.is_empty() {
-                                            errors.push(format!("`{}` cannot be empty", stringify!(#field_ident)));
+                                        let email_regex = regex::Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+                                        if !email_regex.is_match(&self.#field_ident) {
+                                            errors.push(format!("`{}` is not a valid email address", stringify!(#field_ident)));
                                         }
                                     },
                                     _ => quote! {
@@ -48,7 +51,7 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
                                 };
                                 // 拼接检查代码
                                 field_checks.extend(check_code);
-                            });
+                            })
                     });
             }
         }
