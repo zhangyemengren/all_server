@@ -10,6 +10,7 @@ use std::fmt::Debug;
 pub struct Crypto;
 
 impl Crypto {
+    // FIXME: 需要从配置文件中读取
     const SECRET: &'static [u8] = b"secret";
     pub fn hash_password(password: &[u8]) -> Result<String> {
         let salt = SaltString::generate(&mut OsRng);

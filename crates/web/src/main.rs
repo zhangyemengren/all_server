@@ -1,4 +1,5 @@
 use leptos::prelude::*;
+use leptos_router::{components::{ParentRoute, Router, Route, Routes}, path};
 use thaw::{Button, ConfigProvider};
 
 #[component]
@@ -23,12 +24,55 @@ pub fn SimpleCounter(initial_value: i32) -> impl IntoView {
     }
 }
 
+#[component]
+fn PageA() -> impl IntoView {
+    view! {
+        <div>
+            <h1>"这是页面 A"</h1>
+            <a href="/">"返回首页"</a>
+        </div>
+    }
+}
+
+#[component]
+fn PageB() -> impl IntoView {
+    view! {
+        <div>
+            <h1>"这是页面 B"</h1>
+            <a href="/">"返回首页"</a>
+        </div>
+    }
+}
+
+#[component]
+fn App() -> impl IntoView {
+    view! {
+        <Router>
+            <main>
+            // <Routes/> both defines our routes and shows them on the page
+                <Routes fallback=|| "Not found.">
+                // our root route: the contact list is always shown
+                <ParentRoute
+                    path=path!("")
+                    view=move || view! { <p class="contact">"Select a contact."</p> }
+                >
+                    // users like /gbj or /bob
+                    <Route
+                    path=path!(":id")
+                    view=move || view! { <p class="contact">"Select a contact."</p> }
+                    />
+                    // a fallback if the /:id segment is missing from the URL
+                    <Route
+                    path=path!("")
+                    view=move || view! { <p class="contact">"Select a contact."</p> }
+                    />
+                </ParentRoute>
+                </Routes>
+            </main>
+        </Router>
+    }
+}
+
 pub fn main() {
-    mount_to_body(|| {
-        view! {
-            <ConfigProvider>
-                <SimpleCounter initial_value=3 />
-            </ConfigProvider>
-        }
-    })
+    mount_to_body(|| view! { <App/> })
 }

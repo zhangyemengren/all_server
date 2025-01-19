@@ -2,14 +2,19 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Attribute, Data, DeriveInput, Fields};
 
+/// 生成自定义Derive宏
 #[proc_macro_derive(Validate, attributes(validate))]
 pub fn derive_validate(input: TokenStream) -> TokenStream {
+    // 解析输入的 TokenStream
     let ast = parse_macro_input!(input as DeriveInput);
+    // 获取结构体名
     let struct_ident = &ast.ident;
+    // 检查结构体上是否有 #[validate(...)] 属性
     let has_struct_validate = has_struct_level_validate(&ast.attrs);
 
+    // 根据结构体上是否有 #[validate(...)] 属性，生成不同的代码
     let expanded = if has_struct_validate {
-        // 仅生成可传入Fn的校验方法，忽略字段校验
+        // 如果结构体上有 #[validate(...)] 属性，则生成一个可传入Fn的校验方法，忽略字段校验
         quote! {
             impl #struct_ident {
                 pub fn validate<F>(&self, f: F) -> Result<(), String>
@@ -21,28 +26,31 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
             }
         }
     } else {
-        // 原有字段校验逻辑
-        // 准备一个容器，用于存储要生成的"检查逻辑"
+        // 如果结构体上没有 #[validate(...)] 属性，则生成一个校验方法，对每个字段进行校验
         let mut field_checks = proc_macro2::TokenStream::new();
 
+        // 检查是否为结构体
         if let Data::Struct(data_struct) = &ast.data {
-            // 4. 获取结构体所有字段
+            // 检查是否为命名结构体（非元组，单元结构体）
             if let Fields::Named(fields_named) = &data_struct.fields {
+                // 遍历字段
                 fields_named.named.iter()
                     .filter_map(|field| field.ident.as_ref().map(|field_ident| (field, field_ident))) // 过滤掉没有字段名的字段
                     .for_each(|(field, field_ident)| {
-                        // 5. 遍历字段上的属性，查找 #[validate(...)]
+                        // 遍历字段上的属性，查找 #[validate(...)]
                         field.attrs.iter()
                             .filter_map(|attr| get_validate_type_from_attr(attr)) // 过滤掉没有validator_type
                             .for_each(|validator_type| {
                                 // 根据 validator_type 生成不同的校验逻辑
                                 let check_code = match validator_type.as_str() {
+                                    // 邮箱校验
                                     "email" => quote! {
                                         let email_regex = regex::Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
                                         if !email_regex.is_match(&self.#field_ident) {
                                             errors.push(format!("`{}` is not a valid email address", stringify!(#field_ident)));
                                         }
                                     },
+                                    // 密码校验
                                     "password" => quote! {
                                         let password_regex = regex::Regex::new(r"^[A-Za-z\d@$!%*?&]{8,}$").unwrap();
                                         // 检查是否包含小写字母
@@ -61,7 +69,7 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
                                         errors.push(format!("Unknown validator `{}` for `{}`", #validator_type, stringify!(#field_ident)));
                                     },
                                 };
-                                // 拼接检查代码
+                                // 将检查代码插入到 field_checks 中
                                 field_checks.extend(check_code);
                             })
                     });
@@ -73,7 +81,7 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
                 pub fn validate(&self) -> Result<(), String> {
                     let mut errors = Vec::new();
 
-                    // 这里直接插入对每个字段的检查逻辑
+                    // 插入对每个字段的检查逻辑
                     #field_checks
 
                     if errors.is_empty() {
@@ -89,16 +97,16 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
     TokenStream::from(expanded)
 }
 
-/// 解析 #[validate(...)] 属性，若为 `#[validate(email)]`，则返回 Some("email")
+/// 解析字段上的属性，获取校验类型
 fn get_validate_type_from_attr(attr: &Attribute) -> Option<String> {
-    // 1. 确认属性名是否是 "validate"
+    // 确认属性名是否是 "validate"
     if !attr.path().is_ident("validate") {
         return None;
     }
 
-    // 2. 使用 parse_nested_meta 解析属性内部内容
-    //    例如: #[validate(email)], #[validate(something_else)]
     let mut result = None;
+
+    // 解析属性内部内容
     let parse_result = attr.parse_nested_meta(|meta| {
         // 若 meta 为 email，则记录下来
         match meta.path.get_ident() {
@@ -118,6 +126,7 @@ fn get_validate_type_from_attr(attr: &Attribute) -> Option<String> {
     result
 }
 
+/// 检查结构体上是否有 #[validate(...)] 属性
 fn has_struct_level_validate(attrs: &[Attribute]) -> bool {
     attrs.iter().any(|attr| {
         // 检查属性名是否为 "validate"
