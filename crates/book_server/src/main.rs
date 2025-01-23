@@ -1,4 +1,4 @@
-use recipes_server::app::new_app;
+use book_server::app::new_app;
 
 #[tokio::main]
 async fn main() {

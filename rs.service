@@ -11,7 +11,7 @@ WorkingDirectory=/home/lighthouse/project/all_server
 EnvironmentFile=/home/lighthouse/project/all_server/.env
 
 # 二进制
-ExecStart=/home/lighthouse/project/all_server/target/release/recipes_server
+ExecStart=/home/lighthouse/project/all_server/target/release/book_server
 
 Restart=always
 RestartSec=5

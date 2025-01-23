@@ -274,6 +274,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "book_server"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "argon2",
+ "axum",
+ "dotenvy",
+ "http",
+ "jiff",
+ "jsonwebtoken",
+ "password-hash",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "tower-http",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1894,26 +1914,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "recipes_server"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "argon2",
- "axum",
- "dotenvy",
- "http",
- "jiff",
- "jsonwebtoken",
- "password-hash",
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
- "tower",
- "tower-http",
 ]
 
 [[package]]
