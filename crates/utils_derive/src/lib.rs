@@ -39,29 +39,22 @@ pub fn derive_validate(input: TokenStream) -> TokenStream {
                     .for_each(|(field, field_ident)| {
                         // 遍历字段上的属性，查找 #[validate(...)]
                         field.attrs.iter()
-                            .filter_map(|attr| get_validate_type_from_attr(attr)) // 过滤掉没有validator_type
+                            .filter_map(get_validate_type_from_attr) // 过滤掉没有validator_type
                             .for_each(|validator_type| {
                                 // 根据 validator_type 生成不同的校验逻辑
                                 let check_code = match validator_type.as_str() {
                                     // 邮箱校验
                                     "email" => quote! {
-                                        let email_regex = regex::Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
-                                        if !email_regex.is_match(&self.#field_ident) {
+                                        // 因为这个代码是在 proc macro 中生成的，会在使用这个宏的 crate 中展开。我们需要使用完整的路径。
+                                        let is_valid = ::utils::Validator::validate_email(&self.#field_ident);
+                                        if !is_valid {
                                             errors.push(format!("`{}` is not a valid email address", stringify!(#field_ident)));
                                         }
                                     },
                                     // 密码校验
                                     "password" => quote! {
-                                        let password_regex = regex::Regex::new(r"^[A-Za-z\d@$!%*?&]{8,}$").unwrap();
-                                        // 检查是否包含小写字母
-                                        let has_lowercase = self.#field_ident.chars().any(|c| c.is_ascii_lowercase());
-                                        // 检查是否包含大写字母
-                                        let has_uppercase = self.#field_ident.chars().any(|c| c.is_ascii_uppercase());
-                                        // 检查是否包含数字
-                                        let has_digit = self.#field_ident.chars().any(|c| c.is_ascii_digit());
-                                        // 检查是否包含特殊字符
-                                        let has_special = self.#field_ident.chars().any(|c| "@$!%*?&".contains(c));
-                                        if !password_regex.is_match(&self.#field_ident) || !has_lowercase || !has_uppercase || !has_digit || !has_special {
+                                        let is_valid = ::utils::Validator::validate_password(&self.#field_ident);
+                                        if !is_valid {
                                             errors.push(format!("`{}` is not a valid password", stringify!(#field_ident)));
                                         }
                                     },

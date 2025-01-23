@@ -291,6 +291,7 @@ dependencies = [
  "tokio",
  "tower",
  "tower-http",
+ "utils",
 ]
 
 [[package]]
@@ -2887,12 +2888,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86bd8d4e895da8537e5315b8254664e6b769c4ff3db18321b297a1e7004392e3"
 
 [[package]]
+name = "utils"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "utils_derive",
+]
+
+[[package]]
 name = "utils_derive"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
- "regex",
  "syn",
 ]
 

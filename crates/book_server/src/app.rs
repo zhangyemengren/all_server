@@ -1,3 +1,4 @@
+use crate::routers::validate_user;
 use axum::{
     extract::Request,
     middleware::{self, Next},
@@ -7,7 +8,6 @@ use axum::{
 };
 use http::StatusCode;
 use tower::ServiceBuilder;
-use crate::routers::validate_user;
 
 pub async fn root() -> &'static str {
     "Hello, Axum!"
@@ -36,10 +36,8 @@ async fn permission_middleware(
 
 // cs bs cm
 pub fn new_app() -> Router {
-    let pub_router: Router<()> = Router::new().nest(
-        "/cm",
-        Router::new().route("/login", get(validate_user)),
-    );
+    let pub_router: Router<()> =
+        Router::new().nest("/cm", Router::new().route("/login", get(validate_user)));
     let cs_routers: Router<()> = Router::new()
         .route("/a", get(root))
         .route_layer(

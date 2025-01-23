@@ -1,0 +1,11 @@
+[package]
+name = "utils"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+validate_derive = ["dep:utils_derive", "dep:regex"]
+
+[dependencies]
+utils_derive = { path = "../utils_derive", optional = true }
+regex = { workspace = true, optional = true }

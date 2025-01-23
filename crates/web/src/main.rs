@@ -1,5 +1,8 @@
 use leptos::prelude::*;
-use leptos_router::{components::{ParentRoute, Router, Route, Routes}, path};
+use leptos_router::{
+    components::{ParentRoute, Route, Router, Routes},
+    path,
+};
 use thaw::{Button, ConfigProvider};
 
 #[component]
@@ -74,5 +77,9 @@ fn App() -> impl IntoView {
 }
 
 pub fn main() {
-    mount_to_body(|| view! { <App/> })
+    mount_to_body(|| view! { 
+        <ConfigProvider>
+            <App/> 
+        </ConfigProvider>
+    })
 }
