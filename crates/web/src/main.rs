@@ -77,9 +77,11 @@ fn App() -> impl IntoView {
 }
 
 pub fn main() {
-    mount_to_body(|| view! { 
-        <ConfigProvider>
-            <App/> 
-        </ConfigProvider>
+    mount_to_body(|| {
+        view! {
+            <ConfigProvider>
+                <App/>
+            </ConfigProvider>
+        }
     })
 }
