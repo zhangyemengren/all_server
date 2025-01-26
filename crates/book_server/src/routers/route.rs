@@ -29,6 +29,11 @@ impl RouteInfo {
             permission,
         }
     }
+
+    /// 获取路由的权限和默认角色
+    pub fn get_auth_info(&self, default_role: Role) -> (Permission, Role) {
+        (self.permission.clone(), default_role)
+    }
 }
 
 impl Route for RouteInfo {
@@ -89,16 +94,23 @@ impl<T: RouterConfig> RouteRegister for RouterBuilder<T> {
     fn register() -> Router {
         let router = Router::new();
         Self::routes().iter().fold(router, |router, route| {
-            let permission = route.required_permission().unwrap_or(Permission::ReadBook);
-            router.route(
-                route.path(),
-                route.handler().route_layer(
-                    ServiceBuilder::new()
-                        .layer(Extension(T::default_role()))
-                        .layer(Extension(permission))
-                        .layer(middleware::from_fn(require_permission)),
-                ),
-            )
+            router.route(route.path(), route.handler())
         })
+    }
+}
+
+/// 为路由添加权限验证层
+pub trait AuthLayer {
+    fn with_auth_layer(self, permission: Permission, role: Role) -> Self;
+}
+
+impl AuthLayer for MethodRouter {
+    fn with_auth_layer(self, permission: Permission, role: Role) -> Self {
+        self.route_layer(
+            ServiceBuilder::new()
+                .layer(Extension(role))
+                .layer(Extension(permission))
+                .layer(middleware::from_fn(require_permission))
+        )
     }
 }

@@ -1,57 +1,33 @@
 use crate::routers::{
     bs_routes, cs_routes,
-    route::{Route, RouteRegister},
-    validate_user,
+    route::{RouterBuilder, RouteRegister},
+    PublicRouter,
 };
-use axum::{routing::get, Router};
+use axum::{middleware::from_fn, Extension, Router};
+use tower::ServiceBuilder;
+use crate::auth::{require_permission, Permission, Role};
 
-// 公共路由枚举
-#[derive(Clone, Copy)]
-pub enum CMRoute {
-    Login,
-    Health,
-}
-
-impl Route for CMRoute {
-    fn path(&self) -> &'static str {
-        match self {
-            Self::Login => "/login",
-            Self::Health => "/health",
-        }
-    }
-
-    fn handler(&self) -> axum::routing::MethodRouter {
-        match self {
-            Self::Login => get(validate_user),
-            Self::Health => get(health_check),
-        }
-    }
-}
-
-// 公共路由注册器
-pub struct CMRouter;
-
-impl RouteRegister for CMRouter {
-    type RouteType = CMRoute;
-
-    fn routes() -> &'static [Self::RouteType] {
-        &[CMRoute::Login, CMRoute::Health]
-    }
-}
-
-async fn health_check() -> &'static str {
-    "Service is healthy!"
+/// 为路由添加权限验证中间件
+fn with_auth_middleware(router: Router) -> Router {
+    router.layer(
+        ServiceBuilder::new()
+            .layer(Extension(Role::guest()))
+            .layer(Extension(Permission::ReadBook))
+            .layer(from_fn(require_permission))
+    )
 }
 
 pub fn new_app() -> Router {
     // 公共路由，不需要权限验证
-    let pub_router = Router::new().nest("/cm", CMRouter::register());
+    let pub_router = RouterBuilder::<PublicRouter>::register();
 
     // API路由（包含客户端和后台路由）
     let api_router = Router::new()
         .nest("/cs", cs_routes())
-        .nest("/bs", bs_routes());
+        .nest("/bs", bs_routes())
+        .merge(pub_router);  // 将公共路由合并到API路由中
 
     // 合并所有路由，并添加API前缀
-    Router::new().merge(pub_router).nest("/api", api_router)
+    Router::new()
+        .nest("/api", with_auth_middleware(api_router))
 }
