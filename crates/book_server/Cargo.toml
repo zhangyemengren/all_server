@@ -18,4 +18,5 @@ anyhow = {workspace = true}
 jsonwebtoken = {workspace = true}
 jiff = {workspace = true}
 http = {workspace = true}
+sqlx = {workspace = true, features = ["postgres", "runtime-tokio"]}
 utils = { path = "../utils", features = ["validate_derive"] }
