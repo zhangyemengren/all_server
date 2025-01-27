@@ -1,6 +1,8 @@
-use axum::Json;
-use serde::Deserialize;
+use axum::{extract::State, Json};
+use serde::{Deserialize, Serialize};
 use utils::Validate;
+
+use crate::{app::AppState, response::ResponseData};
 
 #[derive(Validate, Deserialize, Debug)]
 pub struct User {
@@ -10,17 +12,27 @@ pub struct User {
     password: String,
 }
 
-pub async fn login(Json(payload): Json<User>) -> &'static str {
+#[derive(Serialize, Default)]
+pub struct LoginResponse {
+    token: String,
+}
+
+pub async fn login(
+    State(state): State<AppState>,
+    Json(payload): Json<User>,
+) -> Json<ResponseData<LoginResponse>> {
     let result = payload.validate();
     println!("{:?}", payload);
     match result {
         Ok(_) => {
             println!("User validated");
-            "User validated"
         }
         Err(e) => {
             println!("User validation failed: {:?}", e);
-            "User validation failed"
+            return ResponseData::err(1, "User validation failed".to_string());
         }
     }
+    ResponseData::ok(LoginResponse {
+        token: "".to_string(),
+    })
 }

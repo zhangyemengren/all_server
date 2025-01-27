@@ -1,5 +1,5 @@
 use crate::{
-    auth::{require_permission, Permission, Role},
+    auth::{require_permission, Permission},
     routers::{health_check, login},
 };
 use axum::{
@@ -36,20 +36,41 @@ pub async fn new_app() -> Router {
         .route("/health", get(health_check))
         .route("/login", post(login));
 
+    // 客户端路由，需要权限验证
+    let cs_router = Router::new()
+        .route(
+            "/book/list",
+            get(health_check).route_layer(
+                ServiceBuilder::new()
+                    .layer(Extension(Permission::ReadBook))
+                    .layer(from_fn(require_permission)),
+            ),
+        )
+        .route(
+            "/book/create",
+            get(health_check).route_layer(
+                ServiceBuilder::new()
+                    .layer(Extension(Permission::WriteBook))
+                    .layer(from_fn(require_permission)),
+            ),
+        );
+
+    // 后台路由，需要权限验证
+    let bs_router = Router::new().route(
+        "/user/list",
+        get(health_check).route_layer(
+            ServiceBuilder::new()
+                .layer(Extension(Permission::ManageUsers))
+                .layer(from_fn(require_permission)),
+        ),
+    );
+
     // 合并所有路由C端和B端
     let api_router = Router::new()
-        .nest("/cs", pub_router.clone())
-        .nest("/bs", pub_router.clone())
+        .nest("/cs", cs_router)
+        .nest("/bs", bs_router)
         .merge(pub_router); // 将公共路由合并到API路由中
 
     // 合并所有路由，并添加API前缀
-    Router::new()
-        .nest("/api", api_router)
-        .layer(
-            ServiceBuilder::new()
-                .layer(Extension(Role::guest()))
-                .layer(Extension(Permission::ReadBook))
-                .layer(from_fn(require_permission)),
-        )
-        .with_state(state)
+    Router::new().nest("/api", api_router).with_state(state)
 }

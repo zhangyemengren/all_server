@@ -50,11 +50,27 @@ impl Role {
 }
 
 pub async fn require_permission(
-    Extension(role): Extension<Role>,
     Extension(permission): Extension<Permission>,
     req: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    // 从请求中提取角色信息
+    let role = if let Some(auth) = req
+        .headers()
+        .get("Authorization")
+        .and_then(|h| h.to_str().ok())
+    {
+        if auth.starts_with("Bearer admin") {
+            Role::admin()
+        } else if auth.starts_with("Bearer user") {
+            Role::user()
+        } else {
+            Role::guest()
+        }
+    } else {
+        Role::guest()
+    };
+
     if !role.has_permission(&permission) {
         return Err(StatusCode::FORBIDDEN);
     }
