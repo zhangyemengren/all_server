@@ -13,3 +13,13 @@ async fn test_login() {
 
     assert_eq!(email_err_res.status(), 200); // 邮箱错误 暂时200 后续区分业务或http状态码
 }
+
+#[tokio::test]
+async fn test_token() {
+    let token = helper::do_login_and_get_token("test@test.com", "123456qwE!").await;
+    let res = helper::do_request("/api/cs/a", &token, None).await;
+    println!("{:?}", res.status());
+    let body = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    // let body: Value = serde_json::from_slice(&body).unwrap();
+    println!("{:?}", body);
+}

@@ -1,3 +1,4 @@
+use axum::body::to_bytes;
 use axum::http::{header, HeaderMap};
 use axum::{
     body::Body,
@@ -5,13 +6,14 @@ use axum::{
     response::Response,
 };
 use book_server::app::new_app;
+use serde_json::Value;
 use tower::ServiceExt;
 
-pub fn get_author_header(token: &str) -> axum::http::HeaderMap {
-    let author = format!("Bearer {}", token);
-    let mut headers = HeaderMap::new();
-    headers.insert("Authorization", author.parse().unwrap());
-    headers
+pub async fn do_login_and_get_token(email: &str, password: &str) -> String {
+    let res = do_login("/api/login", email, password).await;
+    let body = to_bytes(res.into_body(), usize::MAX).await.unwrap();
+    let body: Value = serde_json::from_slice(&body).unwrap();
+    body["data"]["token"].as_str().unwrap().to_string()
 }
 
 pub async fn do_login(uri: &str, email: &str, password: &str) -> Response {
@@ -36,26 +38,20 @@ pub async fn do_login(uri: &str, email: &str, password: &str) -> Response {
     .unwrap()
 }
 
-// pub async fn do_request(uri: &str, body: Option<Body>) -> Response {
-//     let body = body.unwrap_or(Body::empty());
-//     let app = new_app().await;
-//     let token = new_token().await;
-//     let headers = get_author_header(&token);
-//     app.oneshot(
-//         Request::builder()
-//             .method(Method::GET)
-//             .uri(uri)
-//             .header(
-//                 header::AUTHORIZATION,
-//                 headers
-//                     .get(header::AUTHORIZATION)
-//                     .unwrap()
-//                     .to_str()
-//                     .unwrap(),
-//             )
-//             .body(body)
-//             .unwrap(),
-//     )
-//     .await
-//     .unwrap()
-// }
+pub async fn do_request(uri: &str, token: &str, body: Option<Body>) -> Response {
+    let body = body.unwrap_or(Body::empty());
+    let app = new_app().await;
+    app.oneshot(
+        Request::builder()
+            .method(Method::GET)
+            .uri(uri)
+            .header(
+                header::AUTHORIZATION,
+                format!("Bearer {}", token),
+            )
+            .body(body)
+            .unwrap(),
+    )
+    .await
+    .unwrap()
+}

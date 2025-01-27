@@ -1,8 +1,9 @@
 use axum::{extract::Request, middleware::Next, response::Response, Extension};
 use http::StatusCode;
+use serde::Serialize;
 use std::collections::HashSet;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize)]
 pub enum Permission {
     ReadBook,
     WriteBook,
@@ -10,7 +11,7 @@ pub enum Permission {
     ManageSystem,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub enum Role {
     Admin(HashSet<Permission>),
     User(HashSet<Permission>),
@@ -70,6 +71,7 @@ pub async fn require_permission(
     } else {
         Role::guest()
     };
+    println!("role {:?}, permission {:?}", role, role.has_permission(&permission));
 
     if !role.has_permission(&permission) {
         return Err(StatusCode::FORBIDDEN);

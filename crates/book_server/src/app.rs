@@ -39,7 +39,7 @@ pub async fn new_app() -> Router {
     // 客户端路由，需要权限验证
     let cs_router = Router::new()
         .route(
-            "/book/list",
+            "/a",
             get(health_check).route_layer(
                 ServiceBuilder::new()
                     .layer(Extension(Permission::ReadBook))
@@ -47,7 +47,7 @@ pub async fn new_app() -> Router {
             ),
         )
         .route(
-            "/book/create",
+            "/b",
             get(health_check).route_layer(
                 ServiceBuilder::new()
                     .layer(Extension(Permission::WriteBook))
@@ -57,7 +57,7 @@ pub async fn new_app() -> Router {
 
     // 后台路由，需要权限验证
     let bs_router = Router::new().route(
-        "/user/list",
+        "/c",
         get(health_check).route_layer(
             ServiceBuilder::new()
                 .layer(Extension(Permission::ManageUsers))
