@@ -19,6 +19,14 @@ pub enum Role {
 }
 
 impl Role {
+    pub fn from_db_user(permission_id: i32) -> Self {
+        match permission_id {
+            1 => Role::admin(),
+            2 => Role::user(),
+            3 => Role::guest(),
+            _ => Role::guest(),
+        }
+    }
     pub fn admin() -> Self {
         let mut permissions = HashSet::new();
         permissions.insert(Permission::ReadBook);
