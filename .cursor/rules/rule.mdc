@@ -1,6 +1,7 @@
 ---
 description: 
 globs: 
+alwaysApply: false
 ---
 # 项目背景
 - 基于rust的workspace项目，包含多个子项目，主要内容为一些服务项目，web后台项目，一些公用工具和proc- macro
