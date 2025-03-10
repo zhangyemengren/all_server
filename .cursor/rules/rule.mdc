@@ -12,9 +12,7 @@ alwaysApply: false
 - compose.yaml 基于docker的一些项目依赖项和其他的内容 如数据库， 自托管的项目等
 - migrations/ 数据库迁移文件存放处 用于ci中一些建表脚本 添加表基础数据等 也可快速用于新环境部署
 - create/hs_server 炉石相关服务内容
-- crates/book_server 书相关服务内容
 - crates/utils_derive 自定义derive宏存放此处
-- crates/web 目前仅用于书的b端前端
 
 ## 项目技术背景
 - 基于tokio的异步框架

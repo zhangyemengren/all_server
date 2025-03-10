@@ -75,11 +75,11 @@ pub async fn request_blizzard_api(
     match res.status() {
         StatusCode::UNAUTHORIZED => Err(StatusCode::UNAUTHORIZED),
         StatusCode::OK => {
-            if let Ok(json) = res.json::<Value>().await {
+            match res.json::<Value>().await { Ok(json) => {
                 Response::ok(json).into_axum_response()
-            } else {
+            } _ => {
                 Err(StatusCode::INTERNAL_SERVER_ERROR)
-            }
+            }}
         }
         any_code => Err(any_code),
     }
