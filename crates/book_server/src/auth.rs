@@ -64,11 +64,11 @@ pub async fn require_permission(
     next: Next,
 ) -> Result<Response, StatusCode> {
     // 从请求中提取角色信息
-    let role = if let Some(auth) = req
+    let role = match req
         .headers()
         .get("Authorization")
         .and_then(|h| h.to_str().ok())
-    {
+    { Some(auth) => {
         if auth.starts_with("Bearer admin") {
             Role::admin()
         } else if auth.starts_with("Bearer user") {
@@ -76,9 +76,9 @@ pub async fn require_permission(
         } else {
             Role::guest()
         }
-    } else {
+    } _ => {
         Role::guest()
-    };
+    }};
     println!("role {:?}, permission {:?}", role, role.has_permission(&permission));
 
     if !role.has_permission(&permission) {

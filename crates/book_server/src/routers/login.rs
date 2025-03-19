@@ -39,7 +39,9 @@ impl Default for Token {
 
 #[derive(Debug)]
 pub struct DBUser {
+    id: i32,
     username: String,
+    password: String,
     permission_id: i32,
 }
 
