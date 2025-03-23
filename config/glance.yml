@@ -1,69 +1,73 @@
 server:
   port: 3000
 pages:
-  - name: Home
-    # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
-    # hide-desktop-navigation: true
+  - name: Zhangyemengren's Dashboard
+    hide-desktop-navigation: true
     columns:
       - size: small
         widgets:
           - type: calendar
             first-day-of-week: monday
+          - type: clock
+            hour-format: 24h
+            timezones:
+              - timezone: Europe/Paris
+                label: Paris
+              - timezone: America/New_York
+                label: New York
+              - timezone: Asia/Tokyo
+                label: Tokyo
+          - type: server-stats
+            servers:
+              - type: local
+                name: Services
 
-          - type: rss
-            limit: 10
-            collapse-after: 3
-            cache: 12h
-            feeds:
-              - url: https://selfh.st/rss/
-                title: selfh.st
-                limit: 4
-              - url: https://ciechanow.ski/atom.xml
-              - url: https://www.joshwcomeau.com/rss.xml
-                title: Josh Comeau
-              - url: https://samwho.dev/rss.xml
-              - url: https://ishadeed.com/feed.xml
-                title: Ahmad Shadeed
-
-          - type: twitch-channels
-            channels:
-              - theprimeagen
-              - j_blow
-              - piratesoftware
-              - cohhcarnage
-              - christitustech
-              - EJ_SA
 
       - size: full
         widgets:
+          - type: search
+            search-engine: google
           - type: group
             widgets:
+              - type: rss
+                title: World News
+                limit: 12
+                collapse-after: 3
+                cache: 12h
+                feeds:
+                  - url: https://www.huffpost.com/section/world-news/feed
+                    title: World News
+                    limit: 3
+                  - url: https://rss.app/feeds/mZCEr7Cw6doXy6KD.xml
+                    title: AP News
+                    limit: 3
+                  - url: https://feeds.bloomberg.com/markets/news.rss
+                    title: Bloomberg
+                    limit: 3
               - type: hacker-news
               - type: lobsters
 
           - type: videos
+            style: grid-cards
+            limit: 6
             channels:
-              - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
-              - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
-              - UCsBjURrPoezykLs9EqgamOA # Fireship
-              - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
-              - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+              - UCSp-OaMpsO8K0KkOqyBl7_w # Let's Get Rusty
+              - UCR-UCUMwY9iS8oMyWDYIe6_RmoA # No Boilerplate
+              - UC4JX40jDee_tINbkjycV4Sg # Tech With Tim
 
-          - type: group
-            widgets:
-              - type: reddit
-                subreddit: technology
-                show-thumbnails: true
-              - type: reddit
-                subreddit: selfhosted
-                show-thumbnails: true
+          - type: repository
+            repository: rust-lang/rust
+            pull-requests-limit: 3
+            issues-limit: 3
+            commits-limit: 3
+
 
       - size: small
         widgets:
           - type: weather
-            location: London, United Kingdom
+            location: Beijing, China
             units: metric # alternatively "imperial"
-            hour-format: 12h # alternatively "24h"
+            hour-format: 24h # alternatively "24h"
             # Optionally hide the location from being displayed in the widget
             # hide-location: true
 
@@ -71,25 +75,37 @@ pages:
             markets:
               - symbol: SPY
                 name: S&P 500
+              - symbol: ^IXIC
+                name: NASDAQ
+              - symbol: ^SSEC
+                name: Shanghai Composite
+              - symbol: ^N225
+                name: Nikkei 225
+              - symbol: ^HSI
+                name: Hang Seng
               - symbol: BTC-USD
                 name: Bitcoin
-              - symbol: NVDA
-                name: NVIDIA
-              - symbol: AAPL
-                name: Apple
-              - symbol: MSFT
-                name: Microsoft
 
-          - type: releases
-            cache: 1d
-            # Without authentication the Github API allows for up to 60 requests per hour. You can create a
-            # read-only token from your Github account settings and use it here to increase the limit.
-            # token: ...
-            repositories:
-              - glanceapp/glance
-              - go-gitea/gitea
-              - immich-app/immich
-              - syncthing/syncthing
+          - type: bookmarks
+            groups:
+              - title: Programming Trands
+                links:
+                  - title: OSS Insight
+                    url: https://ossinsight.io/
+                  - title: TIOBE
+                    url: https://www.tiobe.com/tiobe-index/
+                  - title: PYPL
+                    url: https://pypl.github.io/PYPL.html
+              - title: Programming Tools
+                links:
+                  - title: Yuanbao
+                    url: https://yuanbao.tencent.com/
+                  - title: IT Tools
+                    url: https://it-tools.tech/
+                  - title: Rust Playground
+                    url: https://play.rust-lang.org/
+                  - title: Caoliao QR Code
+                    url: https://cli.im/
 
   # Add more pages here:
   # - name: Your page name
