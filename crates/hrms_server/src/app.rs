@@ -7,9 +7,11 @@ use axum::{
     routing::{get, post},
     Extension, Router,
 };
+use http::HeaderValue;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use std::time::Duration;
 use tower::ServiceBuilder;
+use tower_http::cors::{Any, CorsLayer};
 
 ///AppState
 #[derive(Clone)]
@@ -31,6 +33,13 @@ pub async fn new_app() -> Router {
         .await
         .expect("Can't connect to database");
     let state = AppState { pool: pool.clone() };
+    // 配置CORS中间件
+    let cors = CorsLayer::new()
+        .allow_origin(HeaderValue::from_static("https://hrms-henna.vercel.app"))
+        .allow_methods(Any)
+        .allow_headers(Any)
+        .allow_credentials(false);
+
     // 公共路由，不需要权限验证
     let pub_router = Router::new()
         .route("/health", get(health_check))
@@ -38,8 +47,8 @@ pub async fn new_app() -> Router {
 
 
     // 后台路由，需要权限验证
-    let bs_router = Router::new().route(
-        "/api",
+    let auth_router = Router::new().route(
+        "/a",
         get(health_check).route_layer(
             ServiceBuilder::new()
                 .layer(Extension(Permission::ManageUsers))
@@ -47,11 +56,14 @@ pub async fn new_app() -> Router {
         ),
     );
 
-    // 合并所有路由C端和B端
-    let api_router = Router::new()
-        .nest("/bs", bs_router)
-        .merge(pub_router); // 将公共路由合并到API路由中
+    // 合并所有API路由
+    let api_routes = Router::new()
+        .merge(pub_router)
+        .merge(auth_router);
 
-    // 合并所有路由，并添加API前缀
-    Router::new().nest("/api", api_router).with_state(state)
+    // 应用前缀、状态和CORS
+    Router::new()
+        .nest("/api", api_routes)  // 所有路由都带/api前缀
+        .with_state(state)
+        .layer(cors)
 }

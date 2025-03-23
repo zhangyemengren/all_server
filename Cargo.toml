@@ -12,7 +12,7 @@ axum = {version = "0.8.0", features = ["macros", "query"]}
 sqlx = {version = "0.8", features = ["postgres", "runtime-tokio"]}
 dotenvy = "0.15"
 tower = {version = "0.5", features = ["util"]}
-tower-http = {version = "0.6", features = ["fs", "add-extension"]}
+tower-http = {version = "0.6", features = ["fs", "add-extension", "cors"]}
 argon2 = {version = "0.5", features = ["password-hash"]}
 password-hash = {version = "0.5", features = ["getrandom"]}
 jsonwebtoken = "9"
