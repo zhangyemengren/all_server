@@ -36,28 +36,10 @@ pub async fn new_app() -> Router {
         .route("/health", get(health_check))
         .route("/login", post(login));
 
-    // 客户端路由，需要权限验证
-    let cs_router = Router::new()
-        .route(
-            "/a",
-            get(health_check).route_layer(
-                ServiceBuilder::new()
-                    .layer(Extension(Permission::ReadBook))
-                    .layer(from_fn(require_permission)),
-            ),
-        )
-        .route(
-            "/b",
-            get(health_check).route_layer(
-                ServiceBuilder::new()
-                    .layer(Extension(Permission::WriteBook))
-                    .layer(from_fn(require_permission)),
-            ),
-        );
 
     // 后台路由，需要权限验证
     let bs_router = Router::new().route(
-        "/c",
+        "/api",
         get(health_check).route_layer(
             ServiceBuilder::new()
                 .layer(Extension(Permission::ManageUsers))
@@ -67,7 +49,6 @@ pub async fn new_app() -> Router {
 
     // 合并所有路由C端和B端
     let api_router = Router::new()
-        .nest("/cs", cs_router)
         .nest("/bs", bs_router)
         .merge(pub_router); // 将公共路由合并到API路由中
 

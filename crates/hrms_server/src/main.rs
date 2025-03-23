@@ -1,4 +1,4 @@
-use book_server::app::new_app;
+use hrms_server::app::new_app;
 
 #[tokio::main]
 async fn main() {

@@ -3,7 +3,7 @@ git pull
 
 # 编译项目
 cargo build --release --package hs_server
-cargo build --release --package book_server
+cargo build --release --package hrms_server
 
 # 复制 systemd 服务文件
 sudo cp docker-app.service /etc/systemd/system/
