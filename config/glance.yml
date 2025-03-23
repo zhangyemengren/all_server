@@ -52,7 +52,7 @@ pages:
             limit: 6
             channels:
               - UCSp-OaMpsO8K0KkOqyBl7_w # Let's Get Rusty
-              - UCR-UCUMwY9iS8oMyWDYIe6_RmoA # No Boilerplate
+              - UCUMwY9iS8oMyWDYIe6_RmoA # No Boilerplate
               - UC4JX40jDee_tINbkjycV4Sg # Tech With Tim
 
           - type: repository
@@ -77,7 +77,7 @@ pages:
                 name: S&P 500
               - symbol: ^IXIC
                 name: NASDAQ
-              - symbol: ^SSEC
+              - symbol: 000001.SS
                 name: Shanghai Composite
               - symbol: ^N225
                 name: Nikkei 225
